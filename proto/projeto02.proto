@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package projeto02;
+
+// Mensagem de Descoberta do Gateway
+message Descoberta{
+    bool inicia_descoberta = 1;
+    int32 porta_resposta = 2;
+}
+
+// Mensagem base das Respostas dos Dispositivos a Descoberta do Gateway
+message Resposta {
+    oneof tipo {
+        RespostaSensor sensor = 1;     // anuncio
+        RespostaAtuador atuador = 2;   // anuncio
+        LeituraSensor leitura = 3;     // leitura periodica
+    }
+}
+
+// Mensagem de resposta de um dispositivo sensor
+message RespostaSensor{
+    string tipo = 1;
+    string id = 2;
+    string ip = 3;
+    int32 porta = 4;
+}
+
+// Mensagem de resposta de um dispositivo atuador
+message RespostaAtuador{
+    string tipo = 1;
+    string id = 2;
+    string ip = 3;
+    int32 porta = 4;
+    bool estado_inicial = 5;
+}
+
+message LeituraSensor {
+    string id = 1;
+    float valor = 2;
+    int64 timestamp = 3;
+}
+
+message StatusAtuador{
+    string id = 1;
+    bool estado_atual = 2;
+    int64 timestamp = 3;
+}
+
+// Mensagem de Comando (Gateway -> Atuador via TCP)
+message Comando {
+    string id_alvo = 1;  
+    string tipo_comando = 2; 
+    float parametro = 3;  
+}
+
+// Mensagem de Resposta de Comando (Atuador -> Gateway via TCP)
+message RespostaComando {
+    string id = 1;
+    bool sucesso = 2;
+    string mensagem = 3;   
+}
