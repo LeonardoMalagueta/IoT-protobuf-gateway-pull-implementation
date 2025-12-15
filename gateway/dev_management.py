@@ -173,7 +173,10 @@ def handle_client(conn, addr, devices, devices_lock):
                         d.tipo = info['tipo']
                         d.ip = info['ip']
                         d.porta = info['porta']
-                        d.estado = str(info['estado'])
+                        if 'ultima_leitura' in info and info['ultima_leitura'] is not None:
+                            d.estado = f"{info['ultima_leitura']:.2f}"
+                        else:
+                            d.estado = str(info['estado'])
                         tempo_sem_aparecer_discovery = time.time() - info['timestamp']
                         if tempo_sem_aparecer_discovery < 15:
                             d.online = True
@@ -193,6 +196,7 @@ def handle_client(conn, addr, devices, devices_lock):
 
 def tcp_server_clients(porta_tcp, devices, devices_lock):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.bind(("", porta_tcp))
     sock.listen(5)
     print(f"[DEV_MNG] Aguardando Clientes TCP na porta {porta_tcp}...")

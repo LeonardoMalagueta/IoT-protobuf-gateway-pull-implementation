@@ -12,7 +12,7 @@ import proto.projeto02_pb2 as proto
 
 GRUPO = "224.1.1.1"         #ip do grupo multicast definido
 PORTA_GRUPO = 5007          #porta do grupo multicast (igual)
-MEU_ID = "Atuador02"             #Identificador dele lá na lista
+MEU_ID = "Atuador01"             #Identificador dele lá na lista
 MEU_TIPO = "Lampada"    #tipo do dispositivo padroinzado
 ESTADO_ATUAL = False #Informa o estado atual do atuador
 MEU_PORTA = 5009            #porta unicast do dispositivo (diferente)

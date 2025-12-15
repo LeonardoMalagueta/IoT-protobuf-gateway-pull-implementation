@@ -8,6 +8,7 @@ import struct
 import threading
 import time
 import proto.projeto02_pb2 as proto
+import random
 
 GRUPO = "224.1.1.1"         #ip do grupo multicast definido
 PORTA_GRUPO = 5007          #porta do grupo multicast (igual)
@@ -94,7 +95,7 @@ def enviar_leituras():
 
         # dados da leitura
         leitura.id = MEU_ID
-        leitura.valor = 20.5          # valor fake por enquanto
+        leitura.valor = 20.0 + (random.random() * 10.0)          # valor fake por enquanto
         leitura.timestamp = int(time.time())
 
         sock.sendto(resposta.SerializeToString(), (gateway_addr, gateway_port))
