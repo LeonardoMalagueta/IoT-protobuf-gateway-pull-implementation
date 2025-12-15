@@ -182,6 +182,13 @@ def handle_client(conn, addr, devices, devices_lock):
                         conn.sendall((len(resp_data).to_bytes(4, "big") + resp_data))
                     except Exception as e:
                         print(f"[DEV_MNG] Erro ao falar com atuador: {e}")
+                        resp = proto.RespostaComando()
+                        resp.id = cmd_cliente.id_alvo
+                        resp.sucesso = False
+                        resp.mensagem = f"FALHA: Atuador não respondeu ({e})"
+
+                        erro_bytes = resp.SerializeToString()
+                        conn.sendall(len(erro_bytes).to_bytes(4, "big") + erro_bytes)
                 else:
                     print("[DEV_MNG] Atuador não encontrado ou offline.")
                     resp = proto.RespostaComando()
