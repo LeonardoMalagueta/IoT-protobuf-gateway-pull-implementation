@@ -89,12 +89,43 @@ def listen_device(porta_unicast_udp, devices, devices_lock):
         elif tipo_msg == "leitura":
             leitura = resposta.leitura
 
-            print(f"[DEV_MNG]Leitura do sensor {leitura.id} recebida: valor={leitura.valor} timestamp={leitura.timestamp}")
+            print(f"[DEV_MNG] Leitura do sensor {leitura.id} recebida: valor={leitura.valor} timestamp={leitura.timestamp}")
+
+            destinos = []
 
             with devices_lock:
                 if leitura.id in devices:
+                    # Atualiza info do sensor
                     devices[leitura.id]["ultima_leitura"] = leitura.valor
                     devices[leitura.id]["timestamp"] = leitura.timestamp
+
+                    # Tipo do sensor (ex: "temperatura", "presenca")
+                    tipo_sensor = devices[leitura.id]["tipo"]
+
+                    # Se for sensor de temperatura → encaminha para ArCondicionado
+                    if tipo_sensor == "temperatura":
+                        destinos = [
+                            (info["ip"], info["porta"])
+                            for dev_id, info in devices.items()
+                            if info["tipo"] == "ArCondicionado"
+                        ]
+
+                    # Se for sensor de presença → encaminha para Sirene
+                    elif tipo_sensor == "presenca":
+                        destinos = [
+                            (info["ip"], info["porta"])
+                            for dev_id, info in devices.items()
+                            if info["tipo"] == "Sirene"
+                        ]
+
+            # Envia a mesma mensagem recebida do sensor para os atuadores destino
+            for ip_dst, porta_dst in destinos:
+                try:
+                    socket_udp_uni.sendto(data, (ip_dst, porta_dst))
+                    print(f"[DEV_MNG] Encaminhando leitura do sensor {leitura.id} para {ip_dst}:{porta_dst}")
+                except Exception as e:
+                    print(f"[DEV_MNG] Erro ao encaminhar leitura para {ip_dst}:{porta_dst} -> {e}")
+
         
         elif tipo_msg == "estado":
             status_atuador = resposta.estado
